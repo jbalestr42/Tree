@@ -14,6 +14,7 @@ public abstract class AGrowable
     
     private GameObject GameObject { get; set; }
     private float _timer = 0f;
+    private bool _hasBeenKilled = false;
 
      // Params, they must be configurable
     private float _growthDuration = 2f;
@@ -53,6 +54,8 @@ public abstract class AGrowable
             {
                 child.Prune();
             }
+
+            Children.RemoveAll(child => child.ShouldDie());
         }
     }
 
@@ -65,7 +68,7 @@ public abstract class AGrowable
         {
             _timer += Time.deltaTime;
             
-            if (Parent != null && GameObject != null)
+            if (Parent != null && Parent.GameObject != null)
             {
                 Vector3 offset = (Parent.GameObject.transform.GetChild(2).position - Parent.GameObject.transform.GetChild(1).position) * RelativePercentPosition;
                 GameObject.transform.position = Parent.GameObject.transform.GetChild(1).position + offset; // TODO: cleanup GetChild
@@ -76,9 +79,14 @@ public abstract class AGrowable
 
     public abstract void UpdateBehaviour();
 
-    public virtual bool ShouldDie()
+    public bool ShouldDie()
     {
-        return false;
+        return _hasBeenKilled;
+    }
+
+    public void Kill()
+    {
+        _hasBeenKilled = true;
     }
 
     public void Die()
@@ -132,8 +140,7 @@ public class Bud : AGrowable
 {
      // Params, they must be configurable
     float _energy = 0f;
-    float _energyNeededToCreateBranch = 3f;
-    bool _shouldDie = false;
+    float _energyNeededToCreateBranch = 5f;
 
     public Bud(Tree owner, GameObject gameObject, float relativePercentPosition)
         :base(owner, gameObject, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition)
@@ -146,16 +153,11 @@ public class Bud : AGrowable
         // For now it's in this class, but the energy must come from the leaf and is consummed by the bud
         _energy += Time.deltaTime;
         
-        if (!_shouldDie && CanCreateNewBranch())
+        if (!ShouldDie() && CanCreateNewBranch())
         {
             Owner.AddNewBranch(Parent, RelativePercentPosition);
-            _shouldDie = true;
+            Kill();
         }
-    }
-
-    public override bool ShouldDie()
-    {
-        return _shouldDie;
     }
 
     bool CanCreateNewBranch()
@@ -167,7 +169,7 @@ public class Bud : AGrowable
 public class Branch : AGrowable
 {
      // Params, they must be configurable
-    int _maxBuds = 1;
+    int _maxBuds = 3;
     float _budSpawnPercentMin = 0.60f;
     float _budSpawnPercentMax = 0.90f;
     float _nextBudSpawn = 1f;
@@ -193,7 +195,7 @@ public class Branch : AGrowable
         if (CanCreateNewBud())
         {
             /*Bud child = */Owner.AddNewBud(this, _nextBudSpawn);
-            _nextBudSpawn = Random.Range(_nextBudSpawn, _budSpawnPercentMax);
+            _nextBudSpawn = Random.Range(_budSpawnPercentMin, _budSpawnPercentMax);
         }
     }
 
@@ -228,6 +230,7 @@ public class Tree : MonoBehaviour
         GameObject gameObject = _assetManager.CreateBranch(transform);
 
         Branch branch = new Branch(this, gameObject, relativePercentPosition);
+        gameObject.GetComponentInChildren<GrowableComponent>().Growable = branch;
         
         if (parent != null)
         {
@@ -241,6 +244,7 @@ public class Tree : MonoBehaviour
         GameObject gameObject = _assetManager.CreateBud(transform);
 
         Bud bud = new Bud(this, gameObject, relativePercentPosition);
+        gameObject.GetComponent<GrowableComponent>().Growable = bud;
         
         if (parent != null)
         {
