@@ -29,15 +29,15 @@ public abstract class AGrowable
         RelativePercentPosition = relativePercentPosition;
     }
 
-    public void Update()
+    public void Update(float deltaTime)
     {
-        UpdateBehaviour();
-        UpdatePosition();
+        UpdateBehaviour(deltaTime);
+        UpdatePosition(deltaTime);
         
         // Update children
         for (int i = 0; i < Children.Count; i++)
         {
-            Children[i].Update();
+            Children[i].Update(deltaTime);
         }
     }
 
@@ -58,14 +58,14 @@ public abstract class AGrowable
         }
     }
 
-    void UpdatePosition()
+    void UpdatePosition(float deltaTime)
     {
         float growthPercent = GetGrowthPercent();
 
         // Grow
         if (_timer < _growthDuration && GameObject != null)
         {
-            _timer += Time.deltaTime;
+            _timer += deltaTime;
             
             if (Parent != null && Parent.GameObject != null)
             {
@@ -76,7 +76,7 @@ public abstract class AGrowable
         }
     }
 
-    public abstract void UpdateBehaviour();
+    public abstract void UpdateBehaviour(float deltaTime);
 
     public bool ShouldDie()
     {

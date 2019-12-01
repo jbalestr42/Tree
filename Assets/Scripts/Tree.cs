@@ -15,7 +15,7 @@ public class Tree : MonoBehaviour
     {
         if (_root != null)
         {
-            _root.Update();
+            _root.Update(Time.deltaTime);
             _root.Prune();
         }
     }

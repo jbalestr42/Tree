@@ -10,11 +10,11 @@ public class Bud : AGrowable
         :base(owner, gameObject, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition)
     {}
 
-    public override void UpdateBehaviour()
+    public override void UpdateBehaviour(float deltaTime)
     {
         // Accumulate energy from the sun
         // For now it's in this class, but the energy must come from the leaf and is consummed by the bud
-        _energy += Time.deltaTime;
+        _energy += deltaTime;
         
         if (!ShouldDie() && CanCreateNewBranch())
         {

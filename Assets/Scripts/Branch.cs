@@ -8,19 +8,14 @@ public class Branch : AGrowable
     float _budSpawnPercentMax = 0.90f;
     float _nextBudSpawn = 1f;
 
-    float _energy = 0f;
-
     public Branch(Tree owner, GameObject gameObject, float relativePercentPosition)
         :base(owner, gameObject, new Vector3(0.5f, 2f, 0.5f), relativePercentPosition)
     {
         _nextBudSpawn = Random.Range(_budSpawnPercentMin, _budSpawnPercentMax);
     }
 
-    public override void UpdateBehaviour()
+    public override void UpdateBehaviour(float deltaTime)
     {
-        // Accumulate energy from the sun 
-        _energy += Time.deltaTime;
-
         /* TODO
          * Create bud instead of branch
          * the bud is getting energy from the sun
