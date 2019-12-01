@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TestInputs : MonoBehaviour
 {
-    public Camera _camera;
+    private Camera _camera;
 
     void Start()
     {
