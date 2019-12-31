@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -6,9 +7,7 @@ public enum GrowableType
 {
     Branch = 0,
     Bud,
-    Leaf,
-
-    Count
+    Leaf
 }
 
 public abstract class AGrowable
@@ -41,9 +40,9 @@ public abstract class AGrowable
     
         // Initialiaze the children container
         Children = new Dictionary<GrowableType, List<AGrowable>>();
-        for (int i = 0; i < (int)GrowableType.Count; i++)
+        foreach (GrowableType growableType in (GrowableType[]) Enum.GetValues(typeof(GrowableType)))
         {
-            Children[(GrowableType)i] = new List<AGrowable>();
+            Children[growableType] = new List<AGrowable>();
         }
         Depth = 0;
         idC++;
@@ -166,9 +165,9 @@ public abstract class AGrowable
 
         // TODO: Add these angles in a param
         Vector3 rotation;
-        rotation.x = Random.Range(-45f, 45f);
-        rotation.y = Random.Range(-45f, 45f);
-        rotation.z = Random.Range(-45f, 45f);
+        rotation.x = UnityEngine.Random.Range(-45f, 45f);
+        rotation.y = UnityEngine.Random.Range(-45f, 45f);
+        rotation.z = UnityEngine.Random.Range(-45f, 45f);
 
         // We need to rotate only once for now
         GameObject.transform.Rotate(rotation);
