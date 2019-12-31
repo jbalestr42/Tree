@@ -1,9 +1,16 @@
 ﻿using UnityEngine;
 
+public interface IEnergyConsumer
+{
+    bool ShouldDieIfNotEnoughEnergy();
+    bool HasEnoughEnergy();
+    void ConsumeEnergyFromRoot(AGrowable growable);
+}
+
 public class Branch : AGrowable
 {
      // Params, they must be configurable
-    int _maxBuds = 1;
+    int _maxBuds = 3;
     float _budSpawnPercentMin = 0.60f;
     float _budSpawnPercentMax = 0.90f;
     float _nextBudSpawn = 1f;
@@ -22,11 +29,6 @@ public class Branch : AGrowable
 
     public override void UpdateBehaviour(float deltaTime)
     {
-        /* TODO
-         * Create bud instead of branch
-         * the bud is getting energy from the sun
-         * The energy is transfered to the root
-        */
         if (CanCreateNewBud())
         {
             /*Bud child = */Owner.AddNewBud(this, _nextBudSpawn);
@@ -48,5 +50,10 @@ public class Branch : AGrowable
     bool CanCreateNewLeaf()
     {
         return CountChildren(GrowableType.Leaf) < _maxLeafs && GetGrowthPercent() > _nextLeafSpawn;
+    }
+
+    bool IsLastBranch()
+    {
+        return CountChildren(GrowableType.Branch) == 0;
     }
 }

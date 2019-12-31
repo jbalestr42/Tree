@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
 
+// TODO: add oisif namespace
 public class Tree : MonoBehaviour
 {
+    public float Energy { get; private set; }
+    
     AGrowable _root = null;
+    EnvironmentHelper _environmentHelper;
     AssetManager _assetManager;
 
     void Start()
     {
+        _environmentHelper = FindObjectOfType<EnvironmentHelper>();
         _assetManager = FindObjectOfType<AssetManager>();
         _root = AddNewBranch(null);
     }
@@ -18,6 +23,22 @@ public class Tree : MonoBehaviour
             _root.Update(Time.deltaTime);
             _root.Prune();
         }
+        Debug.Log("Energy : " + Energy);
+    }
+
+    public bool IsEnlightened(AGrowable growable)
+    {
+        return _environmentHelper.IsEnlightened(growable);
+    }
+
+    public void AddEnergy(float energy)
+    {
+        Energy += energy;
+    }
+
+    public void ConsumeEnergy(float energy)
+    {
+        Energy -= energy;
     }
 
     // TODO: use template for better reusability

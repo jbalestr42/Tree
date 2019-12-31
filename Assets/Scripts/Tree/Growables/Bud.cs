@@ -3,7 +3,6 @@
 public class Bud : AGrowable
 {
      // Params, they must be configurable
-    float _energy = 0f;
     float _energyNeededToCreateBranch = 5f;
 
     public Bud(Tree owner, GameObject gameObject, float relativePercentPosition)
@@ -14,17 +13,16 @@ public class Bud : AGrowable
     {
         // Accumulate energy from the sun
         // For now it's in this class, but the energy must come from the leaf and is consummed by the bud
-        _energy += deltaTime;
-        
         if (CanCreateNewBranch())
         {
             Owner.AddNewBranch(Parent, RelativePercentPosition);
+            Owner.ConsumeEnergy(_energyNeededToCreateBranch);
             Kill();
         }
     }
 
     bool CanCreateNewBranch()
     {
-        return (_energy >= _energyNeededToCreateBranch) && !ShouldDie();
+        return (Owner.Energy >= _energyNeededToCreateBranch) && !ShouldDie();
     }
 }

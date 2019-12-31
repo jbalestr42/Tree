@@ -10,6 +10,18 @@ public enum GrowableType
     Leaf
 }
 
+/*
+ * Branch need energy to grow
+ * Not enough energy: after N seconds, die (only if it's the last branch
+ *  
+ * Bud need energy to grow and spawn branch
+ * Not enough energy: after N seconds, die
+ * 
+ * Leaf need energy to grow
+ * Not enough energy: after N seconds, die
+ * 
+ * */
+
 public abstract class AGrowable
 {
     // TODO add depth from bud (from the creator)
@@ -20,8 +32,8 @@ public abstract class AGrowable
     public float RelativePercentPosition { get; } // The relative position between Start and End in the parent branch
     public Dictionary<GrowableType, List<AGrowable>> Children { get; private set; }
     public int Depth { get; set; } // This is depth from the root
+    public GameObject GameObject { get; private set; }
     
-    private GameObject GameObject { get; set; }
     private float _timer = 0f;
     private bool _hasBeenKilled = false;
 
@@ -81,13 +93,12 @@ public abstract class AGrowable
 
     void UpdatePosition(float deltaTime)
     {
-        float growthPercent = GetGrowthPercent();
-
         // Grow
         if (_timer < _growthDuration && GameObject != null)
         {
             _timer += deltaTime;
             
+            float growthPercent = GetGrowthPercent();
             if (Parent != null && Parent.GameObject != null)
             {
                 Vector3 offset = (Parent.GameObject.transform.GetChild(2).position - Parent.GameObject.transform.GetChild(1).position) * RelativePercentPosition;
