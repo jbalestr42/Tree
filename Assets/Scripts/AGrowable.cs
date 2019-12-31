@@ -27,8 +27,6 @@ public abstract class AGrowable
 
      // Params, they must be configurable
     private float _growthDuration = 2f;
-    public int id = 0;
-    public static int idC = 0;
 
     public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 size, float relativePercentPosition)
     {
@@ -45,8 +43,6 @@ public abstract class AGrowable
             Children[growableType] = new List<AGrowable>();
         }
         Depth = 0;
-        idC++;
-        id = idC;
     }
 
     public void Update(float deltaTime)
