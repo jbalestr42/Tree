@@ -1,15 +1,26 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+
+public enum GrowableType
+{
+    Branch = 0,
+    Bud,
+    Leaf,
+
+    Count
+}
 
 public abstract class AGrowable
 {
     // TODO add depth from bud (from the creator)
-    public int Depth { get; set; } // This is depth from the root
+    public Tree Owner { get; private set; }
+    public AGrowable Parent { get; private set; }
+    public GrowableType Type { get; private set; }
     public Vector3 Size { get; set; }
     public float RelativePercentPosition { get; } // The relative position between Start and End in the parent branch
-    public AGrowable Parent { get; private set; }
-    public Tree Owner { get; private set; }
-    public List<AGrowable> Children { get; private set; }
+    public Dictionary<GrowableType, List<AGrowable>> Children { get; private set; }
+    public int Depth { get; set; } // This is depth from the root
     
     private GameObject GameObject { get; set; }
     private float _timer = 0f;
@@ -17,16 +28,26 @@ public abstract class AGrowable
 
      // Params, they must be configurable
     private float _growthDuration = 2f;
+    public int id = 0;
+    public static int idC = 0;
 
-    public AGrowable(Tree owner, GameObject gameObject, Vector3 size, float relativePercentPosition)
+    public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 size, float relativePercentPosition)
     {
-        Depth = 0;
-        Size = size;
-    
         Owner = owner;
         GameObject = gameObject;
-        Children = new List<AGrowable>();
+        Type = type;
+        Size = size;
         RelativePercentPosition = relativePercentPosition;
+    
+        // Initialiaze the children container
+        Children = new Dictionary<GrowableType, List<AGrowable>>();
+        for (int i = 0; i < (int)GrowableType.Count; i++)
+        {
+            Children[(GrowableType)i] = new List<AGrowable>();
+        }
+        Depth = 0;
+        idC++;
+        id = idC;
     }
 
     public void Update(float deltaTime)
@@ -35,9 +56,12 @@ public abstract class AGrowable
         UpdatePosition(deltaTime);
         
         // Update children
-        for (int i = 0; i < Children.Count; i++)
+        foreach (KeyValuePair<GrowableType, List<AGrowable>> children in Children)
         {
-            Children[i].Update(deltaTime);
+            for (int i = 0; i < children.Value.Count; i++)
+            {
+                children.Value[i].Update(deltaTime);
+            }
         }
     }
 
@@ -49,12 +73,14 @@ public abstract class AGrowable
         }
         else
         {
-            foreach (AGrowable child in Children)
+            foreach (KeyValuePair<GrowableType, List<AGrowable>> children in Children)
             {
-                child.Prune();
+                foreach (AGrowable child in children.Value)
+                {
+                    child.Prune();
+                }
+                children.Value.RemoveAll(child => child.ShouldDie());
             }
-
-            Children.RemoveAll(child => child.ShouldDie());
         }
     }
 
@@ -90,11 +116,14 @@ public abstract class AGrowable
 
     public void Die()
     {
-        foreach (AGrowable child in Children)
+        foreach (KeyValuePair<GrowableType, List<AGrowable>> children in Children)
         {
-            child.Die();
+            foreach (AGrowable child in children.Value)
+            {
+                child.Die();
+            }
+            children.Value.Clear();
         }
-        Children.Clear();
         GameObject.Destroy(GameObject);
     }
 
@@ -105,14 +134,25 @@ public abstract class AGrowable
 
     public void AddChild(AGrowable child)
     {
+        Assert.IsTrue(Children.ContainsKey(child.Type), "Keys are initialized in the constructor.");
+
         child.SetParent(this);
-        Children.Add(child);
+        Children[child.Type].Add(child);
     }
 
     public void RemoveChild(AGrowable child)
     {
+        Assert.IsTrue(Children.ContainsKey(child.Type), "Keys are initialized in the constructor.");
+
         child.SetParent(null);
-        Children.Remove(child);
+        Children[child.Type].Remove(child);
+    }
+
+    public int CountChildren(GrowableType type)
+    {
+        Assert.IsTrue(Children.ContainsKey(type), "Keys are initialized in the constructor.");
+
+        return Children[type].Count;
     }
 
     public void SetParent(AGrowable parent)

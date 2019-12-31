@@ -196,6 +196,8 @@ MonoBehaviour:
     type: 3}
   _budPrefab: {fileID: 466727311555627740, guid: ab4a25ac935056f4e8f073355ee70a74,
     type: 3}
+  _leafPrefab: {fileID: 466727311555627740, guid: 95d98c2f125fc1947bd5dc1c30f5aff9,
+    type: 3}
 --- !u!4 &214765343
 Transform:
   m_ObjectHideFlags: 0
@@ -249,7 +251,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91c5d51955d7bc34ab02611b961b3fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 0}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0

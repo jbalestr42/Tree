@@ -20,31 +20,49 @@ public class Tree : MonoBehaviour
         }
     }
 
+    // TODO: use template for better reusability
     public Branch AddNewBranch(AGrowable parent, float relativePercentPosition = 0f)
     {
         GameObject gameObject = _assetManager.CreateBranch(transform);
 
-        Branch branch = new Branch(this, gameObject, relativePercentPosition);
-        gameObject.GetComponentInChildren<GrowableComponent>().Growable = branch;
-        
+        Branch growable = new Branch(this, gameObject, relativePercentPosition);
+        gameObject.GetComponentInChildren<GrowableComponent>().Growable = growable;
+        gameObject.transform.localScale = Vector3.zero;
+
         if (parent != null)
         {
-            parent.AddChild(branch);
+            parent.AddChild(growable);
         }
-        return branch;
+        return growable;
     }
 
     public Bud AddNewBud(AGrowable parent, float relativePercentPosition = 0f)
     {
         GameObject gameObject = _assetManager.CreateBud(transform);
 
-        Bud bud = new Bud(this, gameObject, relativePercentPosition);
-        gameObject.GetComponent<GrowableComponent>().Growable = bud;
+        Bud growable = new Bud(this, gameObject, relativePercentPosition);
+        gameObject.GetComponent<GrowableComponent>().Growable = growable;
+        gameObject.transform.localScale = Vector3.zero;
         
         if (parent != null)
         {
-            parent.AddChild(bud);
+            parent.AddChild(growable);
         }
-        return bud;
+        return growable;
+    }
+
+    public Leaf AddNewLeaf(AGrowable parent, float relativePercentPosition = 0f)
+    {
+        GameObject gameObject = _assetManager.CreateLeaf(transform);
+
+        Leaf growable = new Leaf(this, gameObject, relativePercentPosition);
+        gameObject.GetComponent<GrowableComponent>().Growable = growable;
+        gameObject.transform.localScale = Vector3.zero;
+        
+        if (parent != null)
+        {
+            parent.AddChild(growable);
+        }
+        return growable;
     }
 }

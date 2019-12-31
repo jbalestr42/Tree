@@ -7,7 +7,7 @@ public class Bud : AGrowable
     float _energyNeededToCreateBranch = 5f;
 
     public Bud(Tree owner, GameObject gameObject, float relativePercentPosition)
-        :base(owner, gameObject, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition)
+        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition)
     {}
 
     public override void UpdateBehaviour(float deltaTime)
@@ -16,7 +16,7 @@ public class Bud : AGrowable
         // For now it's in this class, but the energy must come from the leaf and is consummed by the bud
         _energy += deltaTime;
         
-        if (!ShouldDie() && CanCreateNewBranch())
+        if (CanCreateNewBranch())
         {
             Owner.AddNewBranch(Parent, RelativePercentPosition);
             Kill();
@@ -25,6 +25,6 @@ public class Bud : AGrowable
 
     bool CanCreateNewBranch()
     {
-        return (_energy >= _energyNeededToCreateBranch);
+        return (_energy >= _energyNeededToCreateBranch) && !ShouldDie();
     }
 }
