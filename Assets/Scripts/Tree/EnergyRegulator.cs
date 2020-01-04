@@ -87,4 +87,9 @@ public class EnergyRegulator
 
         return isTransfertDone;
     }
+
+    public string DebugString()
+    {
+        return "Current energy: " + _currentEnergy.ToString("F2") + "/" +_data.EnergyMax.ToString("F2") + " |  Depleted timer: " + _depletedTimer;
+    }
 }
