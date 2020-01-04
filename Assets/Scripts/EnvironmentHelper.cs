@@ -7,6 +7,6 @@ public class EnvironmentHelper : Singleton<EnvironmentHelper>
 
     public bool IsEnlightened(AGrowable growable)
     {
-        return !Physics.Raycast(growable.GameObject.transform.position, _sun.transform.forward, 1000);
+        return !Physics.Raycast(growable.GameObject.transform.position, _sun.transform.position - growable.GameObject.transform.position, 1000);
     }
 }

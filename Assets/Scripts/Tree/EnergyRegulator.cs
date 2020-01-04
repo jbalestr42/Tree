@@ -2,7 +2,7 @@
 
 public class EnergyRegulator
 {
-    public struct EnergyData
+    public class EnergyData : ScriptableObject
     {
         public float StartingEnergy;
         public float EnergyConsumptionPerSecond;

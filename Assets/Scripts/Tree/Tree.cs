@@ -3,7 +3,15 @@
 // TODO: add oisif namespace
 public class Tree : MonoBehaviour
 {
-    // TODO add a scriptableObject for the description of each component (Bud, Leaf, EnergData etc.)
+    [SerializeField]
+    private EnergyRegulator.EnergyData _branchEnergyData = null;
+    
+    [SerializeField]
+    private EnergyRegulator.EnergyData _budEnergyData = null;
+    
+    [SerializeField]
+    private EnergyRegulator.EnergyData _leafEnergyData = null;
+
     AGrowable _root = null;
     EnvironmentHelper _environmentHelper;
     AssetManager _assetManager;
@@ -22,6 +30,21 @@ public class Tree : MonoBehaviour
             _root.Update(Time.deltaTime);
             _root.Prune();
         }
+    }
+
+    public EnergyRegulator.EnergyData BranchEnergyData
+    {
+        get { return _branchEnergyData; }
+    }
+
+    public EnergyRegulator.EnergyData BudEnergyData
+    {
+        get { return _budEnergyData; }
+    }
+
+    public EnergyRegulator.EnergyData LeafEnergyData
+    {
+        get { return _leafEnergyData; }
     }
     
     // TODO: use template for better reusability

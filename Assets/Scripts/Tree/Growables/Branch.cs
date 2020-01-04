@@ -16,7 +16,7 @@ public class Branch : AGrowable
     float _energyNeededToCreateLeaf = 1f;
 
     public Branch(Tree owner, GameObject gameObject, float relativePercentPosition)
-        :base(owner, gameObject, GrowableType.Branch, new Vector3(0.5f, 2f, 0.5f), relativePercentPosition, new EnergyRegulator.EnergyData(2f, 0.5f, 10f, 3f))
+        :base(owner, gameObject, GrowableType.Branch, new Vector3(0.5f, 2f, 0.5f), relativePercentPosition, owner.BranchEnergyData)
     {
         _nextBudSpawn = Random.Range(_budSpawnPercentMin, _budSpawnPercentMax);
         _nextLeafSpawn = Random.Range(_leafSpawnPercentMin, _leafSpawnPercentMax);

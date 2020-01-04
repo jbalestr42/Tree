@@ -7,7 +7,7 @@ public class Bud : AGrowable
     float _energyTransfertPerSecond = 1f;
 
     public Bud(Tree owner, GameObject gameObject, float relativePercentPosition)
-        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition, new EnergyRegulator.EnergyData(0f, 0f, 10f, 3f))
+        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition, owner.BudEnergyData)
     {}
 
     public override void UpdateBehaviour(EnergyRegulator energyRegulator, float deltaTime)
