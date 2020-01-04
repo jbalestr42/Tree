@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class EnvironmentHelper : MonoBehaviour
+public class EnvironmentHelper : Singleton<EnvironmentHelper>
 {
     [SerializeField]
     private GameObject _sun = null;

@@ -20,7 +20,18 @@ public enum GrowableType
  * Leaf need energy to grow
  * Not enough energy: after N seconds, die
  * 
+// Leaf should transfer energy from it's position to the root
+// Bud consume energy from his branch
+
+Leaf, bud and branch consume energy to stay alive
  * */
+
+public interface IEnergyConsumer
+{
+    bool ShouldDieIfNotEnoughEnergy();
+    bool HasEnoughEnergy(); // Need to know if a growable didn't received energy for N seconds (then kill it)
+    void UpdateEnergy(AGrowable growable); // Consume and transfert ? each growable implement the proper behaviour
+}
 
 public abstract class AGrowable
 {
@@ -33,6 +44,7 @@ public abstract class AGrowable
     public Dictionary<GrowableType, List<AGrowable>> Children { get; private set; }
     public int Depth { get; set; } // This is depth from the root
     public GameObject GameObject { get; private set; }
+    public EnergyRegulator EnergyRegulator { get; private set; }
     
     private float _timer = 0f;
     private bool _hasBeenKilled = false;
@@ -40,14 +52,15 @@ public abstract class AGrowable
      // Params, they must be configurable
     private float _growthDuration = 2f;
 
-    public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 size, float relativePercentPosition)
+    public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 size, float relativePercentPosition, EnergyRegulator.EnergyData energyData)
     {
         Owner = owner;
         GameObject = gameObject;
         Type = type;
         Size = size;
         RelativePercentPosition = relativePercentPosition;
-    
+        EnergyRegulator = new EnergyRegulator(energyData);
+
         // Initialiaze the children container
         Children = new Dictionary<GrowableType, List<AGrowable>>();
         foreach (GrowableType growableType in (GrowableType[]) Enum.GetValues(typeof(GrowableType)))
@@ -55,11 +68,13 @@ public abstract class AGrowable
             Children[growableType] = new List<AGrowable>();
         }
         Depth = 0;
+        Parent = null;
     }
 
     public void Update(float deltaTime)
     {
-        UpdateBehaviour(deltaTime);
+        UpdateEnergy(deltaTime);
+        UpdateBehaviour(EnergyRegulator, deltaTime);
         UpdatePosition(deltaTime);
         
         // Update children
@@ -91,6 +106,11 @@ public abstract class AGrowable
         }
     }
 
+    void UpdateEnergy(float deltaTime)
+    {
+        EnergyRegulator.Update(deltaTime);
+    }
+
     void UpdatePosition(float deltaTime)
     {
         // Grow
@@ -108,7 +128,7 @@ public abstract class AGrowable
         }
     }
 
-    public abstract void UpdateBehaviour(float deltaTime);
+    public abstract void UpdateBehaviour(EnergyRegulator energyRegulator, float deltaTime);
 
     public bool ShouldDie()
     {

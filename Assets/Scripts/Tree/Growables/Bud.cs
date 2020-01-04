@@ -2,27 +2,36 @@
 
 public class Bud : AGrowable
 {
-     // Params, they must be configurable
+     // TODO: Params, they must be configurable
     float _energyNeededToCreateBranch = 5f;
+    float _energyTransfertPerSecond = 1f;
 
     public Bud(Tree owner, GameObject gameObject, float relativePercentPosition)
-        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition)
+        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition, new EnergyRegulator.EnergyData(0f, 0f, 10f, 3f))
     {}
 
-    public override void UpdateBehaviour(float deltaTime)
+    public override void UpdateBehaviour(EnergyRegulator energyRegulator, float deltaTime)
     {
-        // Accumulate energy from the sun
-        // For now it's in this class, but the energy must come from the leaf and is consummed by the bud
-        if (CanCreateNewBranch())
+        if (energyRegulator.IsDepletedUnrecoverable())
         {
-            Owner.AddNewBranch(Parent, RelativePercentPosition);
-            Owner.ConsumeEnergy(_energyNeededToCreateBranch);
             Kill();
+        }
+        else
+        {
+            // Bud get energy from his parent branch
+            EnergyRegulator.TransfertEnergy(Parent.EnergyRegulator, energyRegulator, deltaTime * _energyTransfertPerSecond);
+
+            if (CanCreateNewBranch(energyRegulator))
+            {
+                Owner.AddNewBranch(Parent, RelativePercentPosition);
+                energyRegulator.ConsumeEnergy(_energyNeededToCreateBranch);
+                Kill();
+            }
         }
     }
 
-    bool CanCreateNewBranch()
+    bool CanCreateNewBranch(EnergyRegulator energyRegulator)
     {
-        return (Owner.Energy >= _energyNeededToCreateBranch) && !ShouldDie();
+        return energyRegulator.HasEnergy(_energyNeededToCreateBranch) && !ShouldDie() && GetGrowthPercent() >= 1f;
     }
 }
