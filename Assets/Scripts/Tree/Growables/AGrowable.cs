@@ -37,14 +37,14 @@ public abstract class AGrowable
 {
     // TODO add depth from bud (from the creator)
     public Tree Owner { get; private set; }
-    public AGrowable Parent { get; private set; }
-    public GrowableType Type { get; private set; }
-    public Vector3 Size { get; set; }
-    public float RelativePercentPosition { get; } // The relative position between Start and End in the parent branch
-    public Dictionary<GrowableType, List<AGrowable>> Children { get; private set; }
-    public int Depth { get; set; } // This is depth from the root
     public GameObject GameObject { get; private set; }
+    public GrowableType Type { get; private set; }
+    public Vector3 Size { get; private set; }
+    public float RelativePercentPosition { get; private set; } // The relative position between Start and End in the parent branch
     public EnergyRegulator EnergyRegulator { get; private set; }
+    public Dictionary<GrowableType, List<AGrowable>> Children { get; private set; }
+    public int Depth { get; private set; } // This is depth from the root
+    public AGrowable Parent { get; private set; }
     
     private float _timer = 0f;
     private bool _hasBeenKilled = false;
