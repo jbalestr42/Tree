@@ -39,25 +39,25 @@ public abstract class AGrowable
     public Tree Owner { get; private set; }
     public GameObject GameObject { get; private set; }
     public GrowableType Type { get; private set; }
-    public Vector3 Size { get; private set; }
+    public Vector3 Scale { get; private set; } // TODO rename for scale ?
     public float RelativePercentPosition { get; private set; } // The relative position between Start and End in the parent branch
     public EnergyRegulator EnergyRegulator { get; private set; }
     public Dictionary<GrowableType, List<AGrowable>> Children { get; private set; }
     public int Depth { get; private set; } // This is depth from the root
+    public float CurrentSize { get; private set; }
+    public float MaxSize { get; set; }
     public AGrowable Parent { get; private set; }
-    
-    private float _timer = 0f;
+
     private bool _hasBeenKilled = false;
 
-     // Params, they must be configurable
-    private float _growthDuration = 2f;
-
-    public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 size, float relativePercentPosition, EnergyRegulator.EnergyData energyData)
+    // Params, they must be configurable
+    
+    public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 scale, float maxSize, float relativePercentPosition, EnergyRegulator.EnergyData energyData)
     {
         Owner = owner;
         GameObject = gameObject;
         Type = type;
-        Size = size;
+        Scale = scale;
         RelativePercentPosition = relativePercentPosition;
         EnergyRegulator = new EnergyRegulator(energyData);
 
@@ -68,6 +68,8 @@ public abstract class AGrowable
             Children[growableType] = new List<AGrowable>();
         }
         Depth = 0;
+        CurrentSize = 0;
+        MaxSize = maxSize;
         Parent = null;
     }
 
@@ -113,22 +115,50 @@ public abstract class AGrowable
 
     void UpdatePosition(float deltaTime)
     {
+        //supprimer getGrowthFactor et refaire le système dans les classes enfant pour faire pousser de nouveaux objets
+
         // Grow
-        if (_timer < _growthDuration && GameObject != null)
+        if (CurrentSize < MaxSize)
         {
-            _timer += deltaTime;
-            
-            float growthPercent = GetGrowthPercent();
+            CurrentSize += deltaTime * GetGrowthFactor();
+            CurrentSize = Mathf.Min(CurrentSize, MaxSize);
+        }
+
+        if (GameObject != null)
+        {
             if (Parent != null && Parent.GameObject != null)
             {
+                CurrentSize = Mathf.Min(CurrentSize, Parent.CurrentSize / 2f); // Can't be bigger than parent
+
                 Vector3 offset = (Parent.GameObject.transform.GetChild(2).position - Parent.GameObject.transform.GetChild(1).position) * RelativePercentPosition;
                 GameObject.transform.position = Parent.GameObject.transform.GetChild(1).position + offset; // TODO: cleanup GetChild
             }
-            GameObject.transform.localScale = growthPercent * Size; // TODO: size x and z must be a param
+            GameObject.transform.localScale = CurrentSize * Scale;
         }
     }
 
     public abstract void UpdateBehaviour(EnergyRegulator energyRegulator, float deltaTime);
+    
+    public void SetParent(AGrowable parent)
+    {
+        Parent = parent;
+        
+        if (parent != null)
+        {
+            Depth = parent.Depth + 1;
+        }
+
+        SetParentBehaviour(parent);
+    }
+
+    public virtual void SetParentBehaviour(AGrowable parent)
+    {
+    }
+
+    public virtual float GetGrowthFactor()
+    {
+        return 1f;
+    }
 
     public bool ShouldDie()
     {
@@ -153,14 +183,9 @@ public abstract class AGrowable
         GameObject.Destroy(GameObject);
     }
 
-    public float GetGrowthPercent()
-    {
-        return Mathf.Clamp(_timer / _growthDuration, 0f, 1f);
-    }
-
     public void AddChild(AGrowable child)
     {
-        Assert.IsTrue(Children.ContainsKey(child.Type), "Keys are initialized in the constructor.");
+        Assert.IsTrue(Children.ContainsKey(child.Type), "Keys must be initialized in the constructor.");
 
         child.SetParent(this);
         Children[child.Type].Add(child);
@@ -168,35 +193,41 @@ public abstract class AGrowable
 
     public void RemoveChild(AGrowable child)
     {
-        Assert.IsTrue(Children.ContainsKey(child.Type), "Keys are initialized in the constructor.");
+        Assert.IsTrue(Children.ContainsKey(child.Type), "Keys must be initialized in the constructor.");
 
         child.SetParent(null);
         Children[child.Type].Remove(child);
     }
 
-    public int CountChildren(GrowableType type)
+    public int CountChildren(GrowableType type, bool recursive = false)
     {
-        Assert.IsTrue(Children.ContainsKey(type), "Keys are initialized in the constructor.");
+        Assert.IsTrue(Children.ContainsKey(type), "Keys must be initialized in the constructor.");
 
-        return Children[type].Count;
-    }
-
-    public void SetParent(AGrowable parent)
-    {
-        Parent = parent;
-        
-        if (parent != null)
+        int count = Children[type].Count;
+        if (recursive)
         {
-            Depth = parent.Depth + 1;
+            foreach (AGrowable growable in Children[type])
+            {
+                count += growable.CountChildren(type, recursive);
+            }
         }
 
-        // TODO: Add these angles in a param
-        Vector3 rotation;
-        rotation.x = UnityEngine.Random.Range(-45f, 45f);
-        rotation.y = UnityEngine.Random.Range(-45f, 45f);
-        rotation.z = UnityEngine.Random.Range(-45f, 45f);
+        return count;
+    }
 
-        // We need to rotate only once for now
-        GameObject.transform.Rotate(rotation);
+    public int CountAllChildren(bool recursive = false)
+    {
+        int count = 0;
+        foreach (GrowableType type in Children.Keys)
+        {
+            count += CountChildren(type, recursive);
+        }
+
+        return count;
+    }
+
+    public string DebugString()
+    {
+        return EnergyRegulator.DebugString() + " | size " + CurrentSize + " / " + MaxSize;
     }
 }

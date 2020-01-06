@@ -48,7 +48,7 @@ public class TestInputs : MonoBehaviour
             style.normal.textColor = Color.white;
             style.fontSize = 30;
 
-            GUI.Label(new Rect(10, 20, 200, 60), "Debug : " + _object.Growable.EnergyRegulator.DebugString(), style);
+            GUI.Label(new Rect(10, 20, 200, 60), "Debug : " + _object.Growable.DebugString(), style);
         }
     }
 }

@@ -7,7 +7,7 @@ public class Bud : AGrowable
     float _energyTransfertPerSecond = 1f;
 
     public Bud(Tree owner, GameObject gameObject, float relativePercentPosition)
-        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), relativePercentPosition, owner.BudEnergyData)
+        :base(owner, gameObject, GrowableType.Bud, new Vector3(0.7f, 0.7f, 0.7f), 1f, relativePercentPosition, owner.BudEnergyData)
     {}
 
     public override void UpdateBehaviour(EnergyRegulator energyRegulator, float deltaTime)
@@ -32,6 +32,6 @@ public class Bud : AGrowable
 
     bool CanCreateNewBranch(EnergyRegulator energyRegulator)
     {
-        return energyRegulator.HasEnergy(_energyNeededToCreateBranch) && !ShouldDie() && GetGrowthPercent() >= 1f;
+        return energyRegulator.HasEnergy(_energyNeededToCreateBranch) && !ShouldDie();
     }
 }
