@@ -51,7 +51,7 @@ public abstract class AGrowable
     private bool _hasBeenKilled = false;
 
     // Params, they must be configurable
-    
+
     public AGrowable(Tree owner, GameObject gameObject, GrowableType type, Vector3 scale, float maxSize, float relativePercentPosition, EnergyRegulator.EnergyData energyData)
     {
         Owner = owner;
@@ -78,7 +78,7 @@ public abstract class AGrowable
         UpdateEnergy(deltaTime);
         UpdateBehaviour(EnergyRegulator, deltaTime);
         UpdatePosition(deltaTime);
-        
+
         // Update children
         foreach (KeyValuePair<GrowableType, List<AGrowable>> children in Children)
         {
@@ -118,17 +118,17 @@ public abstract class AGrowable
         //supprimer getGrowthFactor et refaire le système dans les classes enfant pour faire pousser de nouveaux objets
 
         // Grow
-        if (CurrentSize < MaxSize)
-        {
-            CurrentSize += deltaTime * GetGrowthFactor();
-            CurrentSize = Mathf.Min(CurrentSize, MaxSize);
-        }
+        // if (CurrentSize < MaxSize)
+        // {
+        CurrentSize += deltaTime * GetGrowthFactor();
+        // CurrentSize = Mathf.Min(CurrentSize, MaxSize);
+        // }
 
         if (GameObject != null)
         {
             if (Parent != null && Parent.GameObject != null)
             {
-                CurrentSize = Mathf.Min(CurrentSize, Parent.CurrentSize / 2f); // Can't be bigger than parent
+                CurrentSize = Mathf.Min(CurrentSize, Parent.CurrentSize / 1.5f); // Can't be bigger than parent
 
                 Vector3 offset = (Parent.GameObject.transform.GetChild(2).position - Parent.GameObject.transform.GetChild(1).position) * RelativePercentPosition;
                 GameObject.transform.position = Parent.GameObject.transform.GetChild(1).position + offset; // TODO: cleanup GetChild
@@ -138,11 +138,11 @@ public abstract class AGrowable
     }
 
     public abstract void UpdateBehaviour(EnergyRegulator energyRegulator, float deltaTime);
-    
+
     public void SetParent(AGrowable parent)
     {
         Parent = parent;
-        
+
         if (parent != null)
         {
             Depth = parent.Depth + 1;
@@ -151,9 +151,7 @@ public abstract class AGrowable
         SetParentBehaviour(parent);
     }
 
-    public virtual void SetParentBehaviour(AGrowable parent)
-    {
-    }
+    public virtual void SetParentBehaviour(AGrowable parent) { }
 
     public virtual float GetGrowthFactor()
     {

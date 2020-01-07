@@ -5,10 +5,10 @@ public class Tree : MonoBehaviour
 {
     [SerializeField]
     private EnergyRegulator.EnergyData _branchEnergyData = null;
-    
+
     [SerializeField]
     private EnergyRegulator.EnergyData _budEnergyData = null;
-    
+
     [SerializeField]
     private EnergyRegulator.EnergyData _leafEnergyData = null;
 
@@ -27,7 +27,7 @@ public class Tree : MonoBehaviour
     {
         if (_root != null)
         {
-            _root.Update(Time.deltaTime*5f);
+            _root.Update(Time.deltaTime * 5f);
             _root.Prune();
         }
     }
@@ -46,7 +46,7 @@ public class Tree : MonoBehaviour
     {
         get { return _leafEnergyData; }
     }
-    
+
     // TODO: use template for better reusability
     public Branch AddNewBranch(AGrowable parent, float relativePercentPosition = 0f)
     {
@@ -70,7 +70,7 @@ public class Tree : MonoBehaviour
         Bud growable = new Bud(this, gameObject, relativePercentPosition);
         gameObject.GetComponent<GrowableComponent>().Growable = growable;
         gameObject.transform.localScale = Vector3.zero;
-        
+
         if (parent != null)
         {
             parent.AddChild(growable);
@@ -85,7 +85,7 @@ public class Tree : MonoBehaviour
         Leaf growable = new Leaf(this, gameObject, relativePercentPosition);
         gameObject.GetComponent<GrowableComponent>().Growable = growable;
         gameObject.transform.localScale = Vector3.zero;
-        
+
         if (parent != null)
         {
             parent.AddChild(growable);
